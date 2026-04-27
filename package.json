@@ -1,0 +1,11 @@
+{
+  "name": "bot-hi-verification",
+  "version": "1.0.0",
+  "description": "Telegram Mini App Verification Bot",
+  "scripts": {
+    "deploy": "clasp push"
+  },
+  "devDependencies": {
+    "@google/clasp": "^2.4.2"
+  }
+}

@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="uz">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Verifikatsiya | Zoir UK</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <style>
+    :root {
+      --tg-color-primary: #0075de;
+      --tg-color-bg: var(--tg-theme-bg-color, #ffffff);
+      --tg-color-secondary-bg: var(--tg-theme-secondary-bg-color, #f4f4f5);
+      --tg-color-text: var(--tg-theme-text-color, #000000);
+      --tg-color-hint: var(--tg-theme-hint-color, #8e8e93);
+      --tg-color-link: var(--tg-theme-link-color, #0075de);
+      --tg-color-button: var(--tg-theme-button-color, #0075de);
+      --tg-color-button-text: var(--tg-theme-button-text-color, #ffffff);
+      --radius: 16px;
+      --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: var(--font);
+      background-color: var(--tg-color-bg);
+      color: var(--tg-color-text);
+      line-height: 1.5;
+      overflow-x: hidden;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── Header ── */
+    header {
+      padding: 16px 20px;
+      position: sticky;
+      top: 0;
+      background: var(--tg-color-bg);
+      z-index: 10;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+      font-size: 18px;
+      color: var(--tg-color-primary);
+    }
+
+    .lang-selector {
+      display: flex;
+      gap: 8px;
+    }
+
+    .lang-btn {
+      background: var(--tg-color-secondary-bg);
+      border: none;
+      padding: 4px 8px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--tg-color-text);
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .lang-btn.active {
+      background: var(--tg-color-primary);
+      color: white;
+    }
+
+    /* ── Progress ── */
+    .progress-container {
+      width: 100%;
+      height: 4px;
+      background: rgba(0, 0, 0, 0.05);
+      position: relative;
+    }
+
+    .progress-bar {
+      position: absolute;
+      left: 0;
+      top: 0;
+      height: 100%;
+      background: var(--tg-color-primary);
+      width: 0%;
+      transition: width 0.4s ease;
+      box-shadow: 0 0 10px rgba(0, 117, 222, 0.3);
+    }
+
+    /* ── Main content ── */
+    main {
+      flex: 1;
+      padding: 24px 20px;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    .step-content {
+      display: none;
+      animation: slideIn 0.4s ease forwards;
+    }
+
+    .step-content.active {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateX(20px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    .title {
+      font-size: 24px;
+      font-weight: 800;
+      line-height: 1.2;
+      margin-bottom: 8px;
+    }
+
+    .subtitle {
+      font-size: 15px;
+      color: var(--tg-color-hint);
+      margin-bottom: 16px;
+    }
+
+    /* ── Options ── */
+    .options-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .option-card {
+      background: var(--tg-color-secondary-bg);
+      border: 2px solid transparent;
+      padding: 16px;
+      border-radius: var(--radius);
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .option-card:active {
+      transform: scale(0.98);
+    }
+
+    .option-card.selected {
+      border-color: var(--tg-color-primary);
+      background: rgba(0, 117, 222, 0.05);
+    }
+
+    .option-icon {
+      width: 44px;
+      height: 44px;
+      background: white;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+
+    .option-text {
+      flex: 1;
+    }
+
+    .option-label {
+      font-weight: 600;
+      font-size: 16px;
+      display: block;
+    }
+
+    /* ── Input ── */
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 16px;
+      border-radius: var(--radius);
+      border: 2px solid var(--tg-color-secondary-bg);
+      background: var(--tg-color-secondary-bg);
+      color: var(--tg-color-text);
+      font-size: 16px;
+      font-family: inherit;
+      outline: none;
+      transition: var(--transition);
+    }
+
+    input[type="text"]:focus {
+      border-color: var(--tg-color-primary);
+      background: var(--tg-color-bg);
+    }
+
+    /* ── Footer ── */
+    footer {
+      padding: 16px 20px 32px;
+      background: var(--tg-color-bg);
+    }
+
+    .btn-primary {
+      width: 100%;
+      padding: 18px;
+      border-radius: var(--radius);
+      border: none;
+      background: var(--tg-color-button);
+      color: var(--tg-color-button-text);
+      font-size: 17px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: var(--transition);
+    }
+
+    .btn-primary:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .btn-primary:active:not(:disabled) {
+      transform: scale(0.98);
+    }
+
+    /* ── Success Screen ── */
+    .success-screen {
+      position: fixed;
+      inset: 0;
+      background: var(--tg-color-bg);
+      z-index: 100;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px;
+      text-align: center;
+    }
+
+    .success-icon {
+      font-size: 80px;
+      margin-bottom: 24px;
+      animation: pop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    @keyframes pop {
+      0% { transform: scale(0); }
+      100% { transform: scale(1); }
+    }
+
+    /* ── Loader ── */
+    .loader-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(255, 255, 255, 0.8);
+      z-index: 1000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(4px);
+    }
+
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 4px solid var(--tg-color-secondary-bg);
+      border-top-color: var(--tg-color-primary);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="loader-overlay" id="loader">
+    <div class="spinner"></div>
+  </div>
+
+  <header>
+    <div class="brand">
+      <span>Zoir UK</span>
+    </div>
+    <div class="lang-selector">
+      <button class="lang-btn active" onclick="setLanguage('uz')">UZ</button>
+      <button class="lang-btn" onclick="setLanguage('ru')">RU</button>
+      <button class="lang-btn" onclick="setLanguage('en')">EN</button>
+    </div>
+  </header>
+
+  <div class="progress-container">
+    <div class="progress-bar" id="progressBar"></div>
+  </div>
+
+  <main id="app">
+    <!-- Steps will be injected here -->
+  </main>
+
+  <footer id="footer">
+    <button class="btn-primary" id="nextBtn" onclick="nextStep()" disabled>
+      <span id="nextBtnText">Davom etish</span>
+      <span class="icon">→</span>
+    </button>
+  </footer>
+
+  <div class="success-screen" id="successScreen">
+    <div class="success-icon">✅</div>
+    <h2 class="title" id="successTitle">Muvaffaqiyatli!</h2>
+    <p class="subtitle" id="successDesc">Ma'lumotlaringiz saqlandi. Endi guruhda yozishingiz mumkin.</p>
+    <button class="btn-primary" onclick="tg.close()" style="margin-top: 24px;">Yopish</button>
+  </div>
+
+  <script>
+    const tg = window.Telegram.WebApp;
+    tg.ready();
+    tg.expand();
+
+    // ── State ──
+    let currentLang = 'uz';
+    let currentStepIndex = 0;
+    const answers = {};
+    const userId = tg.initDataUnsafe?.user?.id || 0;
+
+    const translations = {
+      uz: {
+        next: "Davom etish",
+        submit: "Yuborish",
+        q_status: "Siz hozirda qayerdasiz?",
+        q_status_desc: "Iltimos, joriy holatingizni tanlang",
+        status_uk: "Hozir Britaniyadaman",
+        status_before: "Oldin ishlaganman",
+        status_waiting: "Sponsor kutayapman",
+        status_never: "Hali bormaganman",
+        q_farm: "Firma/Ferma nomi",
+        q_farm_desc: "Hozirgi yoki oxirgi ishlagan joyingiz",
+        placeholder_farm: "Masalan: Hadley Farms",
+        q_seasons: "Necha mavsum ishlagansiz?",
+        q_seasons_desc: "Britaniyadagi umumiy tajribangiz",
+        q_sponsor: "Operatoringiz (Sponsor)",
+        q_sponsor_desc: "Sizni yuborgan kompaniya",
+        sponsor_other: "Boshqa...",
+        placeholder_other: "Sponsor nomini yozing",
+        success_title: "Rahmat!",
+        success_desc: "Ma'lumotlar qabul qilindi. Guruhga xush kelibsiz!",
+        reject_title: "Tushunarlu",
+        reject_desc: "Guruhda faqat Britaniyada ishlaydiganlar yozishi mumkin. Siz o'qishda davom etishingiz mumkin.",
+        loading: "Yuborilmoqda..."
+      },
+      ru: {
+        next: "Продолжить",
+        submit: "Отправить",
+        q_status: "Где вы сейчас находитесь?",
+        q_status_desc: "Пожалуйста, выберите ваш текущий статус",
+        status_uk: "Сейчас в Британии",
+        status_before: "Работал раньше",
+        status_waiting: "Жду спонсора",
+        status_never: "Еще не был",
+        q_farm: "Название фермы/компании",
+        q_farm_desc: "Где вы работаете или работали",
+        placeholder_farm: "Например: Hadley Farms",
+        q_seasons: "Сколько сезонов отработали?",
+        q_seasons_desc: "Ваш общий опыт в Британии",
+        q_sponsor: "Ваш оператор (Спонсор)",
+        q_sponsor_desc: "Компания, которая вас отправила",
+        sponsor_other: "Другое...",
+        placeholder_other: "Введите имя спонсора",
+        success_title: "Спасибо!",
+        success_desc: "Данные приняты. Добро пожаловать в группу!",
+        reject_title: "Понятно",
+        reject_desc: "В группе могут писать только те, кто работает в Британии. Вы можете продолжать читать.",
+        loading: "Отправка..."
+      },
+      en: {
+        next: "Continue",
+        submit: "Submit",
+        q_status: "Where are you now?",
+        q_status_desc: "Please select your current status",
+        status_uk: "In the UK now",
+        status_before: "Worked before",
+        status_waiting: "Waiting for sponsor",
+        status_never: "Never been yet",
+        q_farm: "Farm/Company Name",
+        q_farm_desc: "Where you work or worked",
+        placeholder_farm: "Example: Hadley Farms",
+        q_seasons: "How many seasons?",
+        q_seasons_desc: "Your total experience in the UK",
+        q_sponsor: "Your Operator (Sponsor)",
+        q_sponsor_desc: "Company that sent you",
+        sponsor_other: "Other...",
+        placeholder_other: "Enter sponsor name",
+        success_title: "Thank you!",
+        success_desc: "Data received. Welcome to the group!",
+        reject_title: "Understood",
+        reject_desc: "Only those working in the UK can write in the group. You can continue reading.",
+        loading: "Sending..."
+      }
+    };
+
+    const steps = [
+      {
+        id: 'status',
+        key: 'status',
+        type: 'options',
+        options: [
+          { value: 'UK_NOW', icon: '🇬🇧', labelKey: 'status_uk' },
+          { value: 'WORKED_BEFORE', icon: '🏠', labelKey: 'status_before' },
+          { value: 'WAITING', icon: '📋', labelKey: 'status_waiting' },
+          { value: 'NEVER', icon: '❌', labelKey: 'status_never' }
+        ]
+      },
+      {
+        id: 'farm',
+        key: 'farm_name',
+        type: 'text',
+        condition: (ans) => ans.status === 'UK_NOW' || ans.status === 'WORKED_BEFORE'
+      },
+      {
+        id: 'seasons',
+        key: 'seasons_count',
+        type: 'options',
+        options: [
+          { value: '1', icon: '1️⃣', label: '1' },
+          { value: '2', icon: '2️⃣', label: '2' },
+          { value: '3', icon: '3️⃣', label: '3' },
+          { value: '4', icon: '4️⃣', label: '4' },
+          { value: '5+', icon: '🌟', label: '5+' }
+        ],
+        condition: (ans) => ans.status === 'UK_NOW' || ans.status === 'WORKED_BEFORE'
+      },
+      {
+        id: 'sponsor',
+        key: 'sponsor_agent',
+        type: 'options',
+        options: [
+          { value: 'Agri-HR', icon: '🌿', label: 'Agri-HR' },
+          { value: 'Fruitful Jobs', icon: '🍎', label: 'Fruitful Jobs' },
+          { value: 'Concordia', icon: '🤝', label: 'Concordia' },
+          { value: 'HOPS', icon: '🍺', label: 'HOPS' },
+          { value: 'Pro-Force', icon: '💼', label: 'Pro-Force' },
+          { value: 'OTHER', icon: '✏️', labelKey: 'sponsor_other' }
+        ],
+        condition: (ans) => ans.status !== 'NEVER'
+      },
+      {
+        id: 'sponsor_manual',
+        key: 'sponsor_agent',
+        type: 'text',
+        condition: (ans) => ans.sponsor_agent === 'OTHER'
+      }
+    ];
+
+    function setLanguage(lang) {
+      currentLang = lang;
+      document.querySelectorAll('.lang-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.textContent.toLowerCase() === lang);
+      });
+      renderStep();
+    }
+
+    function renderStep() {
+      const step = steps[currentStepIndex];
+      const t = translations[currentLang];
+      const app = document.getElementById('app');
+      
+      // Update progress
+      const progress = ((currentStepIndex) / (steps.length)) * 100;
+      document.getElementById('progressBar').style.width = `${progress}%`;
+
+      let html = '';
+      
+      if (step.type === 'options') {
+        html = `
+          <div class="step-content active">
+            <h1 class="title">${t['q_' + step.id] || t.q_status}</h1>
+            <p class="subtitle">${t['q_' + step.id + '_desc'] || t.q_status_desc}</p>
+            <div class="options-grid">
+              ${step.options.map(opt => `
+                <div class="option-card ${answers[step.key] === opt.value ? 'selected' : ''}" onclick="selectOption('${step.key}', '${opt.value}')">
+                  <div class="option-icon">${opt.icon}</div>
+                  <div class="option-text">
+                    <span class="option-label">${opt.label || t[opt.labelKey]}</span>
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        `;
+      } else if (step.type === 'text') {
+        html = `
+          <div class="step-content active">
+            <h1 class="title">${t['q_' + step.id]}</h1>
+            <p class="subtitle">${t['q_' + step.id + '_desc']}</p>
+            <div class="input-group">
+              <input type="text" id="stepInput" placeholder="${t['placeholder_' + step.id] || ''}" value="${answers[step.key] === 'OTHER' ? '' : (answers[step.key] || '')}" oninput="validateInput()">
+            </div>
+          </div>
+        `;
+      }
+
+      app.innerHTML = html;
+      validateInput();
+      
+      const isLast = isLastStep();
+      document.getElementById('nextBtnText').textContent = isLast ? t.submit : t.next;
+    }
+
+    function selectOption(key, value) {
+      answers[key] = value;
+      renderStep();
+      
+      // Auto advance if it's not the manual sponsor step
+      if (steps[currentStepIndex].id !== 'sponsor' || value !== 'OTHER') {
+        setTimeout(nextStep, 200);
+      }
+    }
+
+    function validateInput() {
+      const step = steps[currentStepIndex];
+      const btn = document.getElementById('nextBtn');
+      
+      if (step.type === 'options') {
+        btn.disabled = !answers[step.key];
+      } else {
+        const val = document.getElementById('stepInput')?.value.trim();
+        btn.disabled = !val || val.length < 2;
+        if (!btn.disabled) {
+          answers[step.key] = val;
+        }
+      }
+    }
+
+    function isLastStep() {
+      // Find next valid step
+      for (let i = currentStepIndex + 1; i < steps.length; i++) {
+        if (!steps[i].condition || steps[i].condition(answers)) return false;
+      }
+      return true;
+    }
+
+    function nextStep() {
+      if (isLastStep()) {
+        submit();
+        return;
+      }
+
+      currentStepIndex++;
+      while (steps[currentStepIndex] && steps[currentStepIndex].condition && !steps[currentStepIndex].condition(answers)) {
+        currentStepIndex++;
+      }
+
+      if (currentStepIndex >= steps.length) {
+        submit();
+      } else {
+        renderStep();
+      }
+    }
+
+    function submit() {
+      const loader = document.getElementById('loader');
+      loader.style.display = 'flex';
+      
+      const payload = {
+        user_id: userId,
+        username: tg.initDataUnsafe?.user?.username || '',
+        full_name: (tg.initDataUnsafe?.user?.first_name || '') + ' ' + (tg.initDataUnsafe?.user?.last_name || ''),
+        status: answers.status,
+        farm_name: answers.farm_name || '-',
+        seasons_count: answers.seasons_count || '0',
+        sponsor_agent: answers.sponsor_agent || '-',
+        lang: currentLang
+      };
+
+      if (typeof google !== 'undefined') {
+        google.script.run
+          .withSuccessHandler(onSuccess)
+          .withFailureHandler(onError)
+          .processMiniAppSubmission(payload);
+      } else {
+        // Mock for local testing
+        setTimeout(() => onSuccess({ success: true }), 1500);
+      }
+    }
+
+    function onSuccess(res) {
+      document.getElementById('loader').style.display = 'none';
+      const t = translations[currentLang];
+      
+      if (answers.status === 'NEVER') {
+        document.getElementById('successTitle').textContent = t.reject_title;
+        document.getElementById('successDesc').textContent = t.reject_desc;
+        document.querySelector('.success-icon').textContent = 'ℹ️';
+      } else {
+        document.getElementById('successTitle').textContent = t.success_title;
+        document.getElementById('successDesc').textContent = t.success_desc;
+      }
+      
+      document.getElementById('successScreen').style.display = 'flex';
+    }
+
+    function onError(err) {
+      document.getElementById('loader').style.display = 'none';
+      alert("Xatolik yuz berdi: " + err);
+    }
+
+    // Start
+    renderStep();
+  </script>
+</body>
+
+</html>
