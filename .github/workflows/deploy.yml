@@ -21,9 +21,7 @@ jobs:
         run: npm install
 
       - name: Create clasp credentials
-        run: |
-          mkdir -p ~/.clasprc.json
-          echo "${{ secrets.CLASSP_CONFIG }}" > ~/.clasprc.json
+        run: echo "${{ secrets.CLASSP_CONFIG }}" > ~/.clasprc.json
 
       - name: Deploy
         run: npm run deploy
