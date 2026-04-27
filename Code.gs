@@ -233,3 +233,5 @@ function setWebhook() {
   const res = callTg('setWebhook', { url: WEB_APP_URL, allowed_updates: JSON.stringify(["message", "chat_member", "chat_join_request", "callback_query"]) });
   SpreadsheetApp.getUi().alert('🔄 Webhook обновлен!\n\nРезультат: ' + res.getContentText());
 }
+/ /   L a s t   d e p l o y   a t t e m p t :   0 4 / 2 7 / 2 0 2 6   2 0 : 1 4 : 1 6  
+ 
